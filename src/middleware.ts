@@ -4,7 +4,7 @@ import { verifySession } from "@/lib/auth";
 
 export async function middleware(request: NextRequest) {
   const session = await verifySession(request);
-
+  console.log('test');
   // Protected routes that require authentication
   const protectedPaths = ["/api/projects", "/api/filesystem"];
   const isProtectedPath = protectedPaths.some((path) =>

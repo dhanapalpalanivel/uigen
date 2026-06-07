@@ -96,6 +96,8 @@ export function createImportMap(files: Map<string, string>): ImportMapResult {
     "react-dom/client": "https://esm.sh/react-dom@19/client",
     "react/jsx-runtime": "https://esm.sh/react@19/jsx-runtime",
     "react/jsx-dev-runtime": "https://esm.sh/react@19/jsx-dev-runtime",
+    // Pinned to match package.json so icon names stay stable across esm.sh versions
+    "lucide-react": "https://esm.sh/lucide-react@0.517.0?deps=react@19",
   };
 
   // Transform each file and create blob URLs
@@ -140,8 +142,10 @@ export function createImportMap(files: Map<string, string>): ImportMapResult {
                             !imp.startsWith("@/");
           
           if (isPackage) {
-            // Add third-party packages directly to import map
-            imports[imp] = `https://esm.sh/${imp}`;
+            // Don't overwrite pre-pinned entries (e.g. lucide-react with version)
+            if (!imports[imp]) {
+              imports[imp] = `https://esm.sh/${imp}`;
+            }
           } else {
             // Add local imports to be processed later
             allImports.add(imp);
@@ -221,9 +225,10 @@ export function createImportMap(files: Map<string, string>): ImportMapResult {
                       !importPath.startsWith("@/");
 
     if (isPackage) {
-      // Handle third-party packages from esm.sh
-      const packageUrl = `https://esm.sh/${importPath}`;
-      imports[importPath] = packageUrl;
+      // Don't overwrite pre-pinned entries (e.g. lucide-react with version)
+      if (!imports[importPath]) {
+        imports[importPath] = `https://esm.sh/${importPath}`;
+      }
       continue;
     }
 
